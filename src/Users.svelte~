@@ -1,0 +1,44 @@
+<script>
+    import { db } from "./firestore.js"
+    import User from './User.svelte'
+    let users = []
+
+    let email = ''
+    let name = ''
+    
+    
+    db.collection('users').orderBy('created').onSnapshot(  data => {
+      users = data.docs
+    })
+    console.log('db users ', users )
+    
+    
+
+    const addUser = () => {
+      const created = new Date().getTime()
+      db.collection('users').add({created,email, name})
+      email = ''
+      name = ''
+    }
+
+</script>
+
+<!-- ############################-->
+
+<div class="user">
+  <form on:submit|preventDefault={addUser}>
+      <input type = "text" bind:value={email}>
+      <input type = "text" bind:value={name} >
+      <button>Add</button>
+  </form>
+</div>
+
+
+<div id="users">
+    {#each users as xuser }
+   <div>{JSON.stringify(xuser.data())}</div> 
+      <User id={xuser.id}  user={xuser.data()} /> 
+    
+    {/each}
+    
+</div>
